@@ -1368,5 +1368,5 @@ rm(suburb_names, dt, dt_agg)
 # Save environment
 
 ```{r}
-save.image(".RData")
+save.image("Population-estimates.RData")
 ```
