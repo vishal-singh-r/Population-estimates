@@ -1203,7 +1203,7 @@ erp_suburb_1995_2023_asgs2021 <- merged_data[, lapply(.SD, sum, na.rm = TRUE),
 setnames(erp_suburb_1995_2023_asgs2021, c("SAL_CODE_2021", "SAL_NAME_2021"), c("SUBURB_CODE", "SUBURB_NAME"))
 
 # Save suburb estimates
-write.csv(erp_suburb_1995_2023_asgs2021, "erp_suburb_1995_2023_asgs2021.csv", row.names = FALSE)
+write.csv(erp_suburb_1995_2023_asgs2021, "Population estimates data/erp_suburb_1995_2023_asgs2021.csv", row.names = FALSE)
 
 # Remove temporary objects
 rm(cg_sa1_2021_sal_2021, merged_data, pop_cols, col)
@@ -1308,7 +1308,7 @@ erp_suburb_1995_2023_asgs2016 <- merged_data[, lapply(.SD, sum, na.rm = TRUE),
 setnames(erp_suburb_1995_2023_asgs2016, c("SSC_CODE_2016", "SSC_NAME_2016"), c("SUBURB_CODE", "SUBURB_NAME"))
 
 # Save suburb estimates
-write.csv(erp_suburb_1995_2023_asgs2016, "erp_suburb_1995_2023_asgs2016.csv", row.names = FALSE)
+write.csv(erp_suburb_1995_2023_asgs2016, "Population estimates data/erp_suburb_1995_2023_asgs2016.csv", row.names = FALSE)
 
 # Remove temporary objects
 rm(cg_ssc_2016_sal_2021, merged_data, col, pop_cols)
