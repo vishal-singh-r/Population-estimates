@@ -766,7 +766,7 @@ erp_backcasting <- correct_population_sums(
   column_to_refer = "p_all_adjusted"
 )
 
-# Step 2:  m_all + f_all should be made == p_all
+# Step 2: m_all + f_all should be made == p_all
 erp_backcasting <- correct_population_sums(
   data = erp_backcasting,
   columns_to_fix = c("m_all_adjusted", "f_all_adjusted"),
@@ -1192,12 +1192,36 @@ pop_cols <- setdiff(names(erp_sa1_1995_2023_asgs2021), c("Year", "SA1_CODE", "SA
 
 # Scale population estimates by RATIO_FROM_TO
 for (col in pop_cols) {
-  merged_data[, (col) := round(get(col) * RATIO_FROM_TO)]
+  merged_data[, (col) := get(col) * RATIO_FROM_TO]
 }
 
 # Aggregate to suburb level
 erp_suburb_1995_2023_asgs2021 <- merged_data[, lapply(.SD, sum, na.rm = TRUE), 
                           by = .(Year, SAL_CODE_2021, SAL_NAME_2021), .SDcols = pop_cols]
+
+# Round population to nearest integer
+for (col in pop_cols) {
+  erp_suburb_1995_2023_asgs2021[, (col) := round(get(col))]
+}
+
+# Making sure totals make sense
+
+# all age groups collectively should match m_all, f_all, or p_all
+# males and females of each age group should match p_all
+
+# This time, instead of forcing all age groups to match with p_all (top down approach),
+# a bottom up approach will be implemented forcing p_all to be the sum of all age groups.
+# Because, for SA2s we had the state population as a benchmark, whereas we are using correspondence data this time.
+
+erp_suburb_1995_2023_asgs2021[, m_all := rowSums(.SD), .SDcols = paste0("m_", c("00_24", "25_44", "45_64", "65_74", "75_84", "85_99"))]
+erp_suburb_1995_2023_asgs2021[, f_all := rowSums(.SD), .SDcols = paste0("f_", c("00_24", "25_44", "45_64", "65_74", "75_84", "85_99"))]
+erp_suburb_1995_2023_asgs2021[, p_00_24 := rowSums(.SD), .SDcols = c("m_00_24", "f_00_24")]
+erp_suburb_1995_2023_asgs2021[, p_25_44 := rowSums(.SD), .SDcols = c("m_25_44", "f_25_44")]
+erp_suburb_1995_2023_asgs2021[, p_45_64 := rowSums(.SD), .SDcols = c("m_45_64", "f_45_64")]
+erp_suburb_1995_2023_asgs2021[, p_65_74 := rowSums(.SD), .SDcols = c("m_65_74", "f_65_74")]
+erp_suburb_1995_2023_asgs2021[, p_75_84 := rowSums(.SD), .SDcols = c("m_75_84", "f_75_84")]
+erp_suburb_1995_2023_asgs2021[, p_85_99 := rowSums(.SD), .SDcols = c("m_85_99", "f_85_99")]
+erp_suburb_1995_2023_asgs2021[, p_all := rowSums(.SD), .SDcols = c("m_all", "f_all")]
 
 # Rename columns for clarity
 setnames(erp_suburb_1995_2023_asgs2021, c("SAL_CODE_2021", "SAL_NAME_2021"), c("SUBURB_CODE", "SUBURB_NAME"))
@@ -1297,12 +1321,36 @@ pop_cols <- setdiff(names(erp_suburb_1995_2023_asgs2021), c("Year", "SUBURB_CODE
 
 # Scale population estimates using RATIO_FROM_TO
 for (col in pop_cols) {
-  merged_data[, (col) := round(get(col) * RATIO_FROM_TO)]
+  merged_data[, (col) := get(col) * RATIO_FROM_TO]
 }
 
 # Aggregate data at the SSC (2016 suburb) level
 erp_suburb_1995_2023_asgs2016 <- merged_data[, lapply(.SD, sum, na.rm = TRUE), 
                        by = .(Year, SSC_CODE_2016, SSC_NAME_2016), .SDcols = pop_cols]
+
+# Round population to nearest integer
+for (col in pop_cols) {
+  erp_suburb_1995_2023_asgs2016[, (col) := round(get(col))]
+}
+
+# Making sure totals make sense
+
+# all age groups collectively should match m_all, f_all, or p_all
+# males and females of each age group should match p_all
+
+# This time, instead of forcing all age groups to match with p_all (top down approach),
+# a bottom up approach will be implemented forcing p_all to be the sum of all age groups.
+# Because, for SA2s we had the state population as a benchmark, whereas we are using correspondence data this time.
+
+erp_suburb_1995_2023_asgs2021[, m_all := rowSums(.SD), .SDcols = paste0("m_", c("00_24", "25_44", "45_64", "65_74", "75_84", "85_99"))]
+erp_suburb_1995_2023_asgs2021[, f_all := rowSums(.SD), .SDcols = paste0("f_", c("00_24", "25_44", "45_64", "65_74", "75_84", "85_99"))]
+erp_suburb_1995_2023_asgs2021[, p_00_24 := rowSums(.SD), .SDcols = c("m_00_24", "f_00_24")]
+erp_suburb_1995_2023_asgs2021[, p_25_44 := rowSums(.SD), .SDcols = c("m_25_44", "f_25_44")]
+erp_suburb_1995_2023_asgs2021[, p_45_64 := rowSums(.SD), .SDcols = c("m_45_64", "f_45_64")]
+erp_suburb_1995_2023_asgs2021[, p_65_74 := rowSums(.SD), .SDcols = c("m_65_74", "f_65_74")]
+erp_suburb_1995_2023_asgs2021[, p_75_84 := rowSums(.SD), .SDcols = c("m_75_84", "f_75_84")]
+erp_suburb_1995_2023_asgs2021[, p_85_99 := rowSums(.SD), .SDcols = c("m_85_99", "f_85_99")]
+erp_suburb_1995_2023_asgs2021[, p_all := rowSums(.SD), .SDcols = c("m_all", "f_all")]
 
 # Rename columns for clarity
 setnames(erp_suburb_1995_2023_asgs2016, c("SSC_CODE_2016", "SSC_NAME_2016"), c("SUBURB_CODE", "SUBURB_NAME"))
