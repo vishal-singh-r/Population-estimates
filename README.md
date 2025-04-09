@@ -37,7 +37,7 @@ If you see mistakes or want to suggest changes, please create an issue on the so
 Text and figures are licensed under Creative Commons Attribution CC BY-SA 4.0. Source code is available at https://github.com/ctrl-shift-vs/Population-estimates, unless otherwise noted. The figures that have been reused from other sources don't fall under this license and can be recognized by a note in their caption: "Figure from ...".
 
 ## Funding
-Mr Vishal is supported by QUT Postgraduate Research Award (QUTPRA) from the Queensland University of Technology and PhD Top-Up Scholarship Award from the Queensland Cardiovascular Research Network (QCVRN)
+Vishal Singh is supported by QUT Postgraduate Research Award (QUTPRA) from the Queensland University of Technology and PhD Top-Up Scholarship Award from the Queensland Cardiovascular Research Network (QCVRN)
 
 ## Citation
 ### For attribution, please cite this work as:
