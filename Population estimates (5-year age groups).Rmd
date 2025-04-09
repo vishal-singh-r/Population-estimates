@@ -1501,5 +1501,6 @@ rm(suburb_names, dt, dt_agg)
 # Save environment
 
 ```{r}
-save.image("Population estimates data/5-year age groups/Population-estimates.RData")
+# save.image("Population estimates data/5-year age groups/Population-estimates.RData")
+# Not saving the .RData file as the size is more than 50MB (80.5MB) allowed by GitHub without adopting large file storage (lfs)
 ```
