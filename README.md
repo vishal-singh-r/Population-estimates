@@ -1,6 +1,6 @@
 # Population estimates
 
-Create population estimates for age and sex combinations from 1995 to 2000 at SA2-level (Australia | 2021 boundaries) and 1995 to 2023 at suburb-level (Queensland, Australia | 2016 and 2021 boundaries)
+Create population estimates for age and sex combinations from 1995 to 2000 at SA2-level (Australia | 2021 boundaries) and 1995 to 2023 at suburb-level (Queensland, Australia | 2016 and 2021 boundaries). The data is available at 5-year age groups and age groups better suited for research on cardiovascular diseases.
 
 ## Authors
 Vishal Singh<sup>1,2</sup><br>
