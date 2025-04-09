@@ -1235,7 +1235,7 @@ rm(dt, dt_agg, sa2_names)
 
 ```
 
-# Step 5: Converting to 2021 suburb using correspondence data
+# Step 5: Converting 2021 SA1 to 2021 suburb using correspondence data
 
 Correspondence for converting SA1 ASGS2021 to SAL (suburbs) 2021 is available from:
 
@@ -1367,7 +1367,7 @@ plot_ly(data = dt_agg, x = ~Year, y = ~Value, color = ~Category,
 rm(suburb_names, dt, dt_agg)
 ```
 
-# Step 6: Converting to 2016 suburbs using correspondece data
+# Step 6: Converting 2021 suburb to 2016 suburbs using correspondece data
 
 Correspondence for converting SAL (suburbs) 2021 to SSC (suburbs) 2016 is available from:
 
