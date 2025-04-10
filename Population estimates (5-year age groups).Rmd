@@ -1,7 +1,7 @@
 ---
-title: "Population estimates"
+title: "Population estimates (5-year age groups)"
 description: |
-  This article provides the steps to create population estimates for age and sex combinations from 1995 to 2000 at SA2-level (Australia | 2021 boundaries) and 1995 to 2023 at suburb-level (Queensland, Australia | 2016 and 2021 boundaries)
+  This article provides the steps to create population estimates for 5-year age group and sex combinations from 1995 to 2000 at SA2-level (Australia | 2021 boundaries) and 1995 to 2023 at suburb-level (Queensland, Australia | 2016 and 2021 boundaries)
 author:
   - name: "Vishal Singh"
     url: https://github.com/ctrl-shift-vs
@@ -472,67 +472,8 @@ cols_to_convert <- setdiff(names(erp_state_1995_2023), "STATE")
 erp_state_1995_2023[, (cols_to_convert) := lapply(.SD, as.numeric), .SDcols = cols_to_convert]
 
 # Form age group categories similar to sa2 data
-# erp_state_1995_2023[, `m_00_04` := rowSums(.SD[, paste0("m_", 0:4)])]
-# erp_state_1995_2023[, `m_05_09` := rowSums(.SD[, paste0("m_", 5:9)])]
-# erp_state_1995_2023[, `m_10_14` := rowSums(.SD[, paste0("m_", 10:14)])]
-# erp_state_1995_2023[, `m_15_19` := rowSums(.SD[, paste0("m_", 15:19)])]
-# erp_state_1995_2023[, `m_20_24` := rowSums(.SD[, paste0("m_", 20:24)])]
-# erp_state_1995_2023[, `m_25_29` := rowSums(.SD[, paste0("m_", 25:29)])]
-# erp_state_1995_2023[, `m_30_34` := rowSums(.SD[, paste0("m_", 30:34)])]
-# erp_state_1995_2023[, `m_35_39` := rowSums(.SD[, paste0("m_", 35:39)])]
-# erp_state_1995_2023[, `m_40_44` := rowSums(.SD[, paste0("m_", 40:44)])]
-# erp_state_1995_2023[, `m_45_49` := rowSums(.SD[, paste0("m_", 45:49)])]
-# erp_state_1995_2023[, `m_50_54` := rowSums(.SD[, paste0("m_", 50:54)])]
-# erp_state_1995_2023[, `m_55_59` := rowSums(.SD[, paste0("m_", 55:59)])]
-# erp_state_1995_2023[, `m_60_64` := rowSums(.SD[, paste0("m_", 60:64)])]
-# erp_state_1995_2023[, `m_65_69` := rowSums(.SD[, paste0("m_", 65:69)])]
-# erp_state_1995_2023[, `m_70_74` := rowSums(.SD[, paste0("m_", 70:74)])]
-# erp_state_1995_2023[, `m_75_79` := rowSums(.SD[, paste0("m_", 75:79)])]
-# erp_state_1995_2023[, `m_80_84` := rowSums(.SD[, paste0("m_", 80:84)])]
-# erp_state_1995_2023[, `m_85_99` := rowSums(.SD[, paste0("m_", 85:100)])]
-# erp_state_1995_2023[, `m_all` := rowSums(.SD[, paste0("m_", 0:100)])]
-# 
-# erp_state_1995_2023[, `f_00_04` := rowSums(.SD[, paste0("f_", 0:4)])]
-# erp_state_1995_2023[, `f_05_09` := rowSums(.SD[, paste0("f_", 5:9)])]
-# erp_state_1995_2023[, `f_10_14` := rowSums(.SD[, paste0("f_", 10:14)])]
-# erp_state_1995_2023[, `f_15_19` := rowSums(.SD[, paste0("f_", 15:19)])]
-# erp_state_1995_2023[, `f_20_24` := rowSums(.SD[, paste0("f_", 20:24)])]
-# erp_state_1995_2023[, `f_25_29` := rowSums(.SD[, paste0("f_", 25:29)])]
-# erp_state_1995_2023[, `f_30_34` := rowSums(.SD[, paste0("f_", 30:34)])]
-# erp_state_1995_2023[, `f_35_39` := rowSums(.SD[, paste0("f_", 35:39)])]
-# erp_state_1995_2023[, `f_40_44` := rowSums(.SD[, paste0("f_", 40:44)])]
-# erp_state_1995_2023[, `f_45_49` := rowSums(.SD[, paste0("f_", 45:49)])]
-# erp_state_1995_2023[, `f_50_54` := rowSums(.SD[, paste0("f_", 50:54)])]
-# erp_state_1995_2023[, `f_55_59` := rowSums(.SD[, paste0("f_", 55:59)])]
-# erp_state_1995_2023[, `f_60_64` := rowSums(.SD[, paste0("f_", 60:64)])]
-# erp_state_1995_2023[, `f_65_69` := rowSums(.SD[, paste0("f_", 65:69)])]
-# erp_state_1995_2023[, `f_70_74` := rowSums(.SD[, paste0("f_", 70:74)])]
-# erp_state_1995_2023[, `f_75_79` := rowSums(.SD[, paste0("f_", 75:79)])]
-# erp_state_1995_2023[, `f_80_84` := rowSums(.SD[, paste0("f_", 80:84)])]
-# erp_state_1995_2023[, `f_85_99` := rowSums(.SD[, paste0("f_", 85:100)])]
-# erp_state_1995_2023[, `f_all` := rowSums(.SD[, paste0("f_", 0:100)])]
-# 
-# erp_state_1995_2023[, `p_00_04` := rowSums(.SD[, paste0("p_", 0:4)])]
-# erp_state_1995_2023[, `p_05_09` := rowSums(.SD[, paste0("p_", 5:9)])]
-# erp_state_1995_2023[, `p_10_14` := rowSums(.SD[, paste0("p_", 10:14)])]
-# erp_state_1995_2023[, `p_15_19` := rowSums(.SD[, paste0("p_", 15:19)])]
-# erp_state_1995_2023[, `p_20_24` := rowSums(.SD[, paste0("p_", 20:24)])]
-# erp_state_1995_2023[, `p_25_29` := rowSums(.SD[, paste0("p_", 25:29)])]
-# erp_state_1995_2023[, `p_30_34` := rowSums(.SD[, paste0("p_", 30:34)])]
-# erp_state_1995_2023[, `p_35_39` := rowSums(.SD[, paste0("p_", 35:39)])]
-# erp_state_1995_2023[, `p_40_44` := rowSums(.SD[, paste0("p_", 40:44)])]
-# erp_state_1995_2023[, `p_45_49` := rowSums(.SD[, paste0("p_", 45:49)])]
-# erp_state_1995_2023[, `p_50_54` := rowSums(.SD[, paste0("p_", 50:54)])]
-# erp_state_1995_2023[, `p_55_59` := rowSums(.SD[, paste0("p_", 55:59)])]
-# erp_state_1995_2023[, `p_60_64` := rowSums(.SD[, paste0("p_", 60:64)])]
-# erp_state_1995_2023[, `p_65_69` := rowSums(.SD[, paste0("p_", 65:69)])]
-# erp_state_1995_2023[, `p_70_74` := rowSums(.SD[, paste0("p_", 70:74)])]
-# erp_state_1995_2023[, `p_75_79` := rowSums(.SD[, paste0("p_", 75:79)])]
-# erp_state_1995_2023[, `p_80_84` := rowSums(.SD[, paste0("p_", 80:84)])]
-# erp_state_1995_2023[, `p_85_99` := rowSums(.SD[, paste0("p_", 85:100)])]
-# erp_state_1995_2023[, `p_all` := rowSums(.SD[, paste0("p_", 0:100)])]
 
-# Define your age groupings
+# Define age groupings
 age_groups <- list(
   "00_04" = 0:4,   "05_09" = 5:9,    "10_14" = 10:14,  "15_19" = 15:19,
   "20_24" = 20:24, "25_29" = 25:29,  "30_34" = 30:34,  "35_39" = 35:39,
@@ -1496,11 +1437,4 @@ plot_ly(data = dt_agg, x = ~Year, y = ~Value, color = ~Category,
 
 # Remove temporary objects
 rm(suburb_names, dt, dt_agg)
-```
-
-# Save environment
-
-```{r}
-# save.image("Population estimates data/5-year age groups/Population-estimates.RData")
-# Not saving the .RData file as the size is more than 50MB (80.5MB) allowed by GitHub without adopting large file storage (lfs)
 ```

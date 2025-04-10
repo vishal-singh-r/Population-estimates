@@ -1,7 +1,7 @@
 ---
-title: "Population estimates"
+title: "Population estimates (for cardiovascular diseases)"
 description: |
-  This article provides the steps to create population estimates for age and sex combinations from 1995 to 2000 at SA2-level (Australia | 2021 boundaries) and 1995 to 2023 at suburb-level (Queensland, Australia | 2016 and 2021 boundaries)
+  This article provides the steps to create population estimates for age groups suitable for cardiovascular disease research and sex combinations from 1995 to 2000 at SA2-level (Australia | 2021 boundaries) and 1995 to 2023 at suburb-level (Queensland, Australia | 2016 and 2021 boundaries)
 author:
   - name: "Vishal Singh"
     url: https://github.com/ctrl-shift-vs
@@ -1411,10 +1411,4 @@ plot_ly(data = dt_agg, x = ~Year, y = ~Value, color = ~Category,
 
 # Remove temporary objects
 rm(suburb_names, dt, dt_agg)
-```
-
-# Save environment
-
-```{r}
-save.image("Population estimates data/For cardiovascular diseases/Population-estimates.RData")
 ```
