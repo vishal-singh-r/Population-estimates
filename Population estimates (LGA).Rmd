@@ -280,7 +280,7 @@ erp_state_1971_2024_nsw_2 <-
 erp_state_1971_2024_nsw <- merge(erp_state_1971_2024_nsw_1, erp_state_1971_2024_nsw_2,
                                  by = names(erp_state_1971_2024_nsw_1)[1], all = TRUE)
 # Add a column of STATE
-erp_state_1971_2024_nsw[, STATE := "nsw"]
+erp_state_1971_2024_nsw[, STATE := "New South Wales"]
 # Delete the last 9 rows
 erp_state_1971_2024_nsw <- erp_state_1971_2024_nsw[1:(dim(erp_state_1971_2024_nsw)[1] - 9)]
 # Remove individual objects
@@ -297,7 +297,7 @@ erp_state_1971_2024_vic_2 <-
 erp_state_1971_2024_vic <- merge(erp_state_1971_2024_vic_1, erp_state_1971_2024_vic_2,
                                  by = names(erp_state_1971_2024_vic_1)[1], all = TRUE)
 # Add a column of STATE
-erp_state_1971_2024_vic[, STATE := "vic"]
+erp_state_1971_2024_vic[, STATE := "Victoria"]
 # Delete the last 9 rows
 erp_state_1971_2024_vic <- erp_state_1971_2024_vic[1:(dim(erp_state_1971_2024_vic)[1] - 9)]
 # Remove individual objects
@@ -314,7 +314,7 @@ erp_state_1971_2024_qld_2 <-
 erp_state_1971_2024_qld <- merge(erp_state_1971_2024_qld_1, erp_state_1971_2024_qld_2,
                                  by = names(erp_state_1971_2024_qld_1)[1], all = TRUE)
 # Add a column of STATE
-erp_state_1971_2024_qld[, STATE := "qld"]
+erp_state_1971_2024_qld[, STATE := "Queensland"]
 # Delete the last 9 rows
 erp_state_1971_2024_qld <- erp_state_1971_2024_qld[1:(dim(erp_state_1971_2024_qld)[1] - 9)]
 # Remove individual objects
@@ -331,7 +331,7 @@ erp_state_1971_2024_sa_2 <-
 erp_state_1971_2024_sa <- merge(erp_state_1971_2024_sa_1, erp_state_1971_2024_sa_2,
                                 by = names(erp_state_1971_2024_sa_1)[1], all = TRUE)
 # Add a column of STATE
-erp_state_1971_2024_sa[, STATE := "sa"]
+erp_state_1971_2024_sa[, STATE := "South Australia"]
 # Delete the last 9 rows
 erp_state_1971_2024_sa <- erp_state_1971_2024_sa[1:(dim(erp_state_1971_2024_sa)[1] - 9)]
 # Remove individual objects
@@ -348,7 +348,7 @@ erp_state_1971_2024_wa_2 <-
 erp_state_1971_2024_wa <- merge(erp_state_1971_2024_wa_1, erp_state_1971_2024_wa_2,
                                 by = names(erp_state_1971_2024_wa_1)[1], all = TRUE)
 # Add a column of STATE
-erp_state_1971_2024_wa[, STATE := "wa"]
+erp_state_1971_2024_wa[, STATE := "Western Australia"]
 # Delete the last 9 rows
 erp_state_1971_2024_wa <- erp_state_1971_2024_wa[1:(dim(erp_state_1971_2024_wa)[1] - 9)]
 # Remove individual objects
@@ -365,7 +365,7 @@ erp_state_1971_2024_tas_2 <-
 erp_state_1971_2024_tas <- merge(erp_state_1971_2024_tas_1, erp_state_1971_2024_tas_2,
                                  by = names(erp_state_1971_2024_tas_1)[1], all = TRUE)
 # Add a column of STATE
-erp_state_1971_2024_tas[, STATE := "tas"]
+erp_state_1971_2024_tas[, STATE := "Tasmania"]
 # Delete the last 9 rows
 erp_state_1971_2024_tas <- erp_state_1971_2024_tas[1:(dim(erp_state_1971_2024_tas)[1] - 9)]
 # Remove individual objects
@@ -382,7 +382,7 @@ erp_state_1971_2024_nt_2 <-
 erp_state_1971_2024_nt <- merge(erp_state_1971_2024_nt_1, erp_state_1971_2024_nt_2,
                                 by = names(erp_state_1971_2024_nt_1)[1], all = TRUE)
 # Add a column of STATE
-erp_state_1971_2024_nt[, STATE := "nt"]
+erp_state_1971_2024_nt[, STATE := "Northern Territory"]
 # Delete the last 9 rows
 erp_state_1971_2024_nt <- erp_state_1971_2024_nt[1:(dim(erp_state_1971_2024_nt)[1] - 9)]
 # Remove individual objects
@@ -399,7 +399,7 @@ erp_state_1971_2024_act_2 <-
 erp_state_1971_2024_act <- merge(erp_state_1971_2024_act_1, erp_state_1971_2024_act_2,
                                  by = names(erp_state_1971_2024_act_1)[1], all = TRUE)
 # Add a column of STATE
-erp_state_1971_2024_act[, STATE := "act"]
+erp_state_1971_2024_act[, STATE := "Australian Capital Territory"]
 # Delete the last 9 rows
 erp_state_1971_2024_act <- erp_state_1971_2024_act[1:(dim(erp_state_1971_2024_act)[1] - 9)]
 # Remove individual objects
@@ -605,14 +605,14 @@ rm(erp_lga_2001_2023_asgs2021_m)
 erp_backcasting[, `LGA_CODE_1` := substr(LGA_CODE, 1, 1)]
 erp_backcasting[, `LGA_CODE_1` := as.numeric(LGA_CODE_1)]
 erp_backcasting <- erp_backcasting[LGA_CODE_1 != 9] # Removing all Other Territories as their data is not available from state level 
-erp_backcasting[, STATE := fcase(LGA_CODE_1 == 1, "nsw",
-                                 LGA_CODE_1 == 2, "vic",
-                                 LGA_CODE_1 == 3, "qld",
-                                 LGA_CODE_1 == 4, "sa",
-                                 LGA_CODE_1 == 5, "wa",
-                                 LGA_CODE_1 == 6, "tas",
-                                 LGA_CODE_1 == 7, "nt",
-                                 LGA_CODE_1 == 8, "act")]
+erp_backcasting[, STATE := fcase(LGA_CODE_1 == 1, "New South Wales",
+                                 LGA_CODE_1 == 2, "Victoria",
+                                 LGA_CODE_1 == 3, "Queensland",
+                                 LGA_CODE_1 == 4, "South Australia",
+                                 LGA_CODE_1 == 5, "Western Australia",
+                                 LGA_CODE_1 == 6, "Tasmania",
+                                 LGA_CODE_1 == 7, "Northern Territory",
+                                 LGA_CODE_1 == 8, "Australian Capital Territory")]
 erp_backcasting[,LGA_CODE := NULL]
 erp_backcasting[,LGA_CODE_1 := NULL]
 
@@ -660,14 +660,14 @@ ratio_table <- erp_backcasting[, c("Year", "STATE", ratio_cols), with = FALSE]
 ratio_table <- unique(ratio_table)
 # Convert to long format for ggplot
 ratio_long <- melt(ratio_table, id.vars = c("Year", "STATE"), variable.name = "Category", value.name = "Ratio")
-# ratio_long <- ratio_long[STATE == "nsw"]
-# ratio_long <- ratio_long[STATE == "vic"]
-ratio_long <- ratio_long[STATE == "qld"]
-# ratio_long <- ratio_long[STATE == "sa"]
-# ratio_long <- ratio_long[STATE == "wa"]
-# ratio_long <- ratio_long[STATE == "tas"]
-# ratio_long <- ratio_long[STATE == "nt"]
-# ratio_long <- ratio_long[STATE == "act"]
+# ratio_long <- ratio_long[STATE == "New South Wales"]
+# ratio_long <- ratio_long[STATE == "Victoria"]
+ratio_long <- ratio_long[STATE == "Queensland"]
+# ratio_long <- ratio_long[STATE == "South Australia"]
+# ratio_long <- ratio_long[STATE == "Western Australia"]
+# ratio_long <- ratio_long[STATE == "Tasmania"]
+# ratio_long <- ratio_long[STATE == "Northern Territory"]
+# ratio_long <- ratio_long[STATE == "Australian Capital Territory"]
 # Plot heatmap
 ggplotly(ggplot(ratio_long, aes(x = Year, y = Category, fill = Ratio)) +
            geom_tile() +
@@ -830,14 +830,14 @@ ratio_table <- erp_backcasting[, c("Year", "STATE", ratio_cols), with = FALSE]
 ratio_table <- unique(ratio_table)
 # Convert to long format for ggplot
 ratio_long <- melt(ratio_table, id.vars = c("Year", "STATE"), variable.name = "Category", value.name = "Ratio")
-# ratio_long <- ratio_long[STATE == "nsw"]
-# ratio_long <- ratio_long[STATE == "vic"]
-ratio_long <- ratio_long[STATE == "qld"]
-# ratio_long <- ratio_long[STATE == "sa"]
-# ratio_long <- ratio_long[STATE == "wa"]
-# ratio_long <- ratio_long[STATE == "tas"]
-# ratio_long <- ratio_long[STATE == "nt"]
-# ratio_long <- ratio_long[STATE == "act"]
+# ratio_long <- ratio_long[STATE == "New South Wales"]
+# ratio_long <- ratio_long[STATE == "Victoria"]
+ratio_long <- ratio_long[STATE == "Queensland"]
+# ratio_long <- ratio_long[STATE == "South Australia"]
+# ratio_long <- ratio_long[STATE == "Western Australia"]
+# ratio_long <- ratio_long[STATE == "Tasmania"]
+# ratio_long <- ratio_long[STATE == "Northern Territory"]
+# ratio_long <- ratio_long[STATE == "Australian Capital Territory"]
 # Plot heatmap
 ggplotly(ggplot(ratio_long, aes(x = Year, y = Category, fill = Ratio)) +
            geom_tile() +
@@ -883,7 +883,7 @@ rm(erp_summarised, abs_cols, i, numeric_cols, ratio_long, ratio_table, ratio_col
 erp_lga_1995_2023_asgs2021 <- copy(erp_backcasting)
 rm(erp_backcasting)
 
-write.csv(erp_lga_1995_2023_asgs2021, "Population estimates data/5-year age groups/erp_lga_1995_2023_asgs2021.csv", row.names = FALSE)
+write.csv(erp_lga_1995_2023_asgs2021, "Population estimates data/5-year age groups/Yearly/erp_lga_1995_2023_asgs2021.csv", row.names = FALSE)
 
 # Remove STATE column
 erp_lga_1995_2023_asgs2021[, STATE := NULL]
@@ -969,8 +969,11 @@ erp_lga_1995_2023_asgs2016[, p_all := rowSums(.SD), .SDcols = c("m_all", "f_all"
 # Rename columns for clarity
 setnames(erp_lga_1995_2023_asgs2016, c("LGA_CODE_2016", "LGA_NAME_2016"), c("LGA_CODE", "LGA_NAME"))
 
+# Remove rows with NA LGA_NAME
+erp_lga_1995_2023_asgs2016 <- erp_lga_1995_2023_asgs2016[!is.na(LGA_NAME)]
+
 # Save lga estimates
-write.csv(erp_lga_1995_2023_asgs2016, "Population estimates data/5-year age groups/erp_lga_1995_2023_asgs2016.csv", row.names = FALSE)
+write.csv(erp_lga_1995_2023_asgs2016, "Population estimates data/5-year age groups/Yearly/erp_lga_1995_2023_asgs2016.csv", row.names = FALSE)
 
 # Remove temporary objects
 rm(cg_lga_2016_lga_2021, merged_data, col, pop_cols, age_cols, age)
