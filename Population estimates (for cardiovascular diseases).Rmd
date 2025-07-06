@@ -45,7 +45,7 @@ library(tidyr)
 # Step 1: Estimated resident population ASGS 2021 data
 
 | Data Property | Specifications |
-|------------------------|-----------------------------------------------|
+|-------------------------|-----------------------------------------------|
 | Age | 5-year groups |
 | Sex | Male, female, persons |
 | Spatial scope | Australia |
@@ -280,7 +280,7 @@ rm(dt, dt_agg, sa2_names, p)
 # Step 3: Correct SA2-level estimates using state-level estimates
 
 | Data Property | Specifications |
-|------------------------|-----------------------------------------------|
+|-------------------------|-----------------------------------------------|
 | Age | 1-year |
 | Sex | Male, female, persons |
 | Spatial scope | Australia |
@@ -307,7 +307,7 @@ erp_state_1971_2024_nsw_2 <-
 erp_state_1971_2024_nsw <- merge(erp_state_1971_2024_nsw_1, erp_state_1971_2024_nsw_2,
                                  by = names(erp_state_1971_2024_nsw_1)[1], all = TRUE)
 # Add a column of STATE
-erp_state_1971_2024_nsw[, STATE := "nsw"]
+erp_state_1971_2024_nsw[, STATE := "New South Wales"]
 # Delete the last 9 rows
 erp_state_1971_2024_nsw <- erp_state_1971_2024_nsw[1:(dim(erp_state_1971_2024_nsw)[1] - 9)]
 # Remove individual objects
@@ -324,7 +324,7 @@ erp_state_1971_2024_vic_2 <-
 erp_state_1971_2024_vic <- merge(erp_state_1971_2024_vic_1, erp_state_1971_2024_vic_2,
                                  by = names(erp_state_1971_2024_vic_1)[1], all = TRUE)
 # Add a column of STATE
-erp_state_1971_2024_vic[, STATE := "vic"]
+erp_state_1971_2024_vic[, STATE := "Victoria"]
 # Delete the last 9 rows
 erp_state_1971_2024_vic <- erp_state_1971_2024_vic[1:(dim(erp_state_1971_2024_vic)[1] - 9)]
 # Remove individual objects
@@ -341,7 +341,7 @@ erp_state_1971_2024_qld_2 <-
 erp_state_1971_2024_qld <- merge(erp_state_1971_2024_qld_1, erp_state_1971_2024_qld_2,
                                  by = names(erp_state_1971_2024_qld_1)[1], all = TRUE)
 # Add a column of STATE
-erp_state_1971_2024_qld[, STATE := "qld"]
+erp_state_1971_2024_qld[, STATE := "Queensland"]
 # Delete the last 9 rows
 erp_state_1971_2024_qld <- erp_state_1971_2024_qld[1:(dim(erp_state_1971_2024_qld)[1] - 9)]
 # Remove individual objects
@@ -358,7 +358,7 @@ erp_state_1971_2024_sa_2 <-
 erp_state_1971_2024_sa <- merge(erp_state_1971_2024_sa_1, erp_state_1971_2024_sa_2,
                                 by = names(erp_state_1971_2024_sa_1)[1], all = TRUE)
 # Add a column of STATE
-erp_state_1971_2024_sa[, STATE := "sa"]
+erp_state_1971_2024_sa[, STATE := "South Australia"]
 # Delete the last 9 rows
 erp_state_1971_2024_sa <- erp_state_1971_2024_sa[1:(dim(erp_state_1971_2024_sa)[1] - 9)]
 # Remove individual objects
@@ -375,7 +375,7 @@ erp_state_1971_2024_wa_2 <-
 erp_state_1971_2024_wa <- merge(erp_state_1971_2024_wa_1, erp_state_1971_2024_wa_2,
                                 by = names(erp_state_1971_2024_wa_1)[1], all = TRUE)
 # Add a column of STATE
-erp_state_1971_2024_wa[, STATE := "wa"]
+erp_state_1971_2024_wa[, STATE := "Western Australia"]
 # Delete the last 9 rows
 erp_state_1971_2024_wa <- erp_state_1971_2024_wa[1:(dim(erp_state_1971_2024_wa)[1] - 9)]
 # Remove individual objects
@@ -392,7 +392,7 @@ erp_state_1971_2024_tas_2 <-
 erp_state_1971_2024_tas <- merge(erp_state_1971_2024_tas_1, erp_state_1971_2024_tas_2,
                                  by = names(erp_state_1971_2024_tas_1)[1], all = TRUE)
 # Add a column of STATE
-erp_state_1971_2024_tas[, STATE := "tas"]
+erp_state_1971_2024_tas[, STATE := "Tasmania"]
 # Delete the last 9 rows
 erp_state_1971_2024_tas <- erp_state_1971_2024_tas[1:(dim(erp_state_1971_2024_tas)[1] - 9)]
 # Remove individual objects
@@ -409,7 +409,7 @@ erp_state_1971_2024_nt_2 <-
 erp_state_1971_2024_nt <- merge(erp_state_1971_2024_nt_1, erp_state_1971_2024_nt_2,
                                 by = names(erp_state_1971_2024_nt_1)[1], all = TRUE)
 # Add a column of STATE
-erp_state_1971_2024_nt[, STATE := "nt"]
+erp_state_1971_2024_nt[, STATE := "Northern Territory"]
 # Delete the last 9 rows
 erp_state_1971_2024_nt <- erp_state_1971_2024_nt[1:(dim(erp_state_1971_2024_nt)[1] - 9)]
 # Remove individual objects
@@ -426,7 +426,7 @@ erp_state_1971_2024_act_2 <-
 erp_state_1971_2024_act <- merge(erp_state_1971_2024_act_1, erp_state_1971_2024_act_2,
                                  by = names(erp_state_1971_2024_act_1)[1], all = TRUE)
 # Add a column of STATE
-erp_state_1971_2024_act[, STATE := "act"]
+erp_state_1971_2024_act[, STATE := "Australian Capital Territory"]
 # Delete the last 9 rows
 erp_state_1971_2024_act <- erp_state_1971_2024_act[1:(dim(erp_state_1971_2024_act)[1] - 9)]
 # Remove individual objects
@@ -631,14 +631,14 @@ rm(erp_sa2_2001_2023_asgs2021_m)
 erp_backcasting[, `SA2_CODE_1` := substr(SA2_CODE, 1, 1)]
 erp_backcasting[, `SA2_CODE_1` := as.numeric(SA2_CODE_1)]
 erp_backcasting <- erp_backcasting[SA2_CODE_1 != 9] # Removing all Other Territories as their data is not available from state level 
-erp_backcasting[, STATE := fcase(SA2_CODE_1 == 1, "nsw",
-                                 SA2_CODE_1 == 2, "vic",
-                                 SA2_CODE_1 == 3, "qld",
-                                 SA2_CODE_1 == 4, "sa",
-                                 SA2_CODE_1 == 5, "wa",
-                                 SA2_CODE_1 == 6, "tas",
-                                 SA2_CODE_1 == 7, "nt",
-                                 SA2_CODE_1 == 8, "act")]
+erp_backcasting[, STATE := fcase(SA2_CODE_1 == 1, "New South Wales",
+                                 SA2_CODE_1 == 2, "Victoria",
+                                 SA2_CODE_1 == 3, "Queensland",
+                                 SA2_CODE_1 == 4, "South Australia",
+                                 SA2_CODE_1 == 5, "Western Australia",
+                                 SA2_CODE_1 == 6, "Tasmania",
+                                 SA2_CODE_1 == 7, "Northern Territory",
+                                 SA2_CODE_1 == 8, "Australian Capital Territory")]
 erp_backcasting[,SA2_CODE := NULL]
 erp_backcasting[,SA2_CODE_1 := NULL]
 
@@ -686,14 +686,7 @@ ratio_table <- erp_backcasting[, c("Year", "STATE", ratio_cols), with = FALSE]
 ratio_table <- unique(ratio_table)
 # Convert to long format for ggplot
 ratio_long <- melt(ratio_table, id.vars = c("Year", "STATE"), variable.name = "Category", value.name = "Ratio")
-# ratio_long <- ratio_long[STATE == "nsw"]
-# ratio_long <- ratio_long[STATE == "vic"]
-ratio_long <- ratio_long[STATE == "qld"]
-# ratio_long <- ratio_long[STATE == "sa"]
-# ratio_long <- ratio_long[STATE == "wa"]
-# ratio_long <- ratio_long[STATE == "tas"]
-# ratio_long <- ratio_long[STATE == "nt"]
-# ratio_long <- ratio_long[STATE == "act"]
+ratio_long <- ratio_long[STATE == "Queensland"]
 # Plot heatmap
 ggplotly(ggplot(ratio_long, aes(x = Year, y = Category, fill = Ratio)) +
            geom_tile() +
@@ -857,14 +850,7 @@ ratio_table <- erp_backcasting[, c("Year", "STATE", ratio_cols), with = FALSE]
 ratio_table <- unique(ratio_table)
 # Convert to long format for ggplot
 ratio_long <- melt(ratio_table, id.vars = c("Year", "STATE"), variable.name = "Category", value.name = "Ratio")
-# ratio_long <- ratio_long[STATE == "nsw"]
-# ratio_long <- ratio_long[STATE == "vic"]
-ratio_long <- ratio_long[STATE == "qld"]
-# ratio_long <- ratio_long[STATE == "sa"]
-# ratio_long <- ratio_long[STATE == "wa"]
-# ratio_long <- ratio_long[STATE == "tas"]
-# ratio_long <- ratio_long[STATE == "nt"]
-# ratio_long <- ratio_long[STATE == "act"]
+ratio_long <- ratio_long[STATE == "Queensland"]
 # Plot heatmap
 ggplotly(ggplot(ratio_long, aes(x = Year, y = Category, fill = Ratio)) +
            geom_tile() +
@@ -910,12 +896,124 @@ rm(erp_summarised, abs_cols, i, numeric_cols, ratio_long, ratio_table, ratio_col
 erp_sa2_1995_2023_asgs2021 <- copy(erp_backcasting)
 rm(erp_backcasting)
 
-write.csv(erp_sa2_1995_2023_asgs2021, "Population estimates data/For cardiovascular diseases/erp_sa2_1995_2023_asgs2021.csv", row.names = FALSE)
+# Add a new column SA2_CODE to erp_sa2_1995_2023_asgs2021 using mapping with SA2_NAME column of erp_sa2_2001_2023_asgs2021_m
+erp_sa2_2001_2023_asgs2021_m <- as.data.table(read_excel("ABS data/erp_sa2_2001_2023_asgs2021.xlsx", 
+                                                         sheet = "Table 1", skip = 6))
+setnames(erp_sa2_2001_2023_asgs2021_m, old = "SA2 code", new = "SA2_CODE")
+setnames(erp_sa2_2001_2023_asgs2021_m, old = "SA2 name", new = "SA2_NAME")
+erp_sa2_2001_2023_asgs2021_m <- erp_sa2_2001_2023_asgs2021_m[,.(SA2_CODE, SA2_NAME)]
+erp_sa2_2001_2023_asgs2021_m <- unique(erp_sa2_2001_2023_asgs2021_m)
+erp_sa2_1995_2023_asgs2021 <- merge(erp_sa2_1995_2023_asgs2021, erp_sa2_2001_2023_asgs2021_m, by = "SA2_NAME", all.x = TRUE)
+rm(erp_sa2_2001_2023_asgs2021_m)
+
+# Rearrange columns
+setcolorder(erp_sa2_1995_2023_asgs2021, c("Year", "STATE", "SA2_NAME", "SA2_CODE",
+                                           grep("^m_", names(erp_sa2_1995_2023_asgs2021), value = TRUE),
+                                           grep("^f_", names(erp_sa2_1995_2023_asgs2021), value = TRUE),
+                                           grep("^p_", names(erp_sa2_1995_2023_asgs2021), value = TRUE)))
+
+# Save SA2 2021 as CSV file
+write.csv(erp_sa2_1995_2023_asgs2021, "Population estimates data/For cardiovascular diseases/Yearly/erp_sa2_1995_2023_asgs2021.csv", row.names = FALSE)
 
 # Remove all non-qld data as SA1 level estimates are not available for them
-erp_sa2_1995_2023_asgs2021_qld <- erp_sa2_1995_2023_asgs2021[STATE == "qld"]
+erp_sa2_1995_2023_asgs2021_qld <- erp_sa2_1995_2023_asgs2021[STATE == "Queensland"]
 # Remove STATE column
 erp_sa2_1995_2023_asgs2021_qld[, STATE := NULL]
+
+# Remove SA2_CODE column as that is not required anymore - SA2_NAME acts as a unique identifier in itself
+erp_sa2_1995_2023_asgs2021_qld[, SA2_CODE := NULL]
+```
+
+## Converting 2021 SA2 to 2016 SA2 using correspondece data
+
+Correspondence for converting SA2 2021 to SA2 2016 is available from:
+
+Australian Bureau of Statistics. (2021). ASGS Geographic Correspondences (2021) Edition 3. ABS. <https://data.gov.au/data/dataset/asgs-edition-3-2021-correspondences>.
+
+```{r warning=FALSE, layout="l-body-outset", fig.height=8, fig.width = 9}
+# Load correspondence file
+cg_sa2_2016_sa2_2021 <- as.data.table(read.csv('ABS data/CG_SA2_2016_SA2_2021.csv'))
+
+# Convert "SA1_CODE_2021" and "SAL_CODE_2021" to numeric
+cg_sa2_2016_sa2_2021[, SA2_CODE_2016 := as.numeric(SA2_MAINCODE_2016)]
+cg_sa2_2016_sa2_2021[, SA2_CODE_2021 := as.numeric(SA2_CODE_2021)]
+
+# Inspecting the quality of correspondence
+plot(table(cg_sa2_2016_sa2_2021$INDIV_TO_REGION_QLTY_INDICATOR))
+
+# Ensure column names match for merging
+setnames(cg_sa2_2016_sa2_2021, "SA2_CODE_2021", "SA2_CODE")
+
+# Merge SA2 population data with the correspondence table
+merged_data <- merge(erp_sa2_1995_2023_asgs2021, 
+                     cg_sa2_2016_sa2_2021[, .(`SA2_CODE`, SA2_CODE_2016, SA2_NAME_2016, RATIO_FROM_TO)], 
+                     by = "SA2_CODE", all.x = TRUE, allow.cartesian = TRUE)
+
+# Identify population columns
+pop_cols <- grep("^(m_|f_|p_)", names(erp_sa2_1995_2023_asgs2021), value = TRUE)
+
+# Scale population estimates using RATIO_FROM_TO
+for (col in pop_cols) {
+  merged_data[, (col) := get(col) * RATIO_FROM_TO]
+}
+
+# Aggregate data at the SA2 (2016 SA2) level
+erp_sa2_1995_2023_asgs2016 <- merged_data[, lapply(.SD, sum, na.rm = TRUE), 
+                                             by = .(Year, SA2_CODE_2016, SA2_NAME_2016), .SDcols = pop_cols]
+
+# Round population to nearest integer
+for (col in pop_cols) {
+  erp_sa2_1995_2023_asgs2016[, (col) := round(get(col))]
+}
+
+# Making sure totals make sense
+
+# all age groups collectively should match m_all, f_all, or p_all
+# males and females of each age group should match p_all
+
+# This time, instead of forcing all age groups to match with p_all (top down approach),
+# a bottom up approach will be implemented forcing p_all to be the sum of all age groups.
+# Because, for SA2s we had the state population as a benchmark, whereas we are using correspondence data this time.
+
+# Total = sum of all age groups
+age_cols <- c("00_24", "25_44", "45_64", "65_74","75_84", "85_99")
+erp_sa2_1995_2023_asgs2016[, m_all := rowSums(.SD), .SDcols = paste0("m_", age_cols)]
+erp_sa2_1995_2023_asgs2016[, f_all := rowSums(.SD), .SDcols = paste0("f_", age_cols)]
+erp_sa2_1995_2023_asgs2016[, p_all := rowSums(.SD), .SDcols = paste0("p_", age_cols)]
+
+# Persons = males + females
+for (age in age_cols) {
+  erp_sa2_1995_2023_asgs2016[, (paste0("p_", age)) := rowSums(.SD), .SDcols = c(paste0("m_", age), paste0("f_", age))]
+}
+erp_sa2_1995_2023_asgs2016[, p_all := rowSums(.SD), .SDcols = c("m_all", "f_all")]
+
+# Rename columns for clarity
+setnames(erp_sa2_1995_2023_asgs2016, c("SA2_CODE_2016", "SA2_NAME_2016"), c("SA2_CODE", "SA2_NAME"))
+
+# Form STATE column using SA2_CODE
+erp_sa2_1995_2023_asgs2016[, `SA2_CODE_1` := substr(SA2_CODE, 1, 1)]
+erp_sa2_1995_2023_asgs2016[, `SA2_CODE_1` := as.numeric(SA2_CODE_1)]
+erp_sa2_1995_2023_asgs2016[, STATE := fcase(SA2_CODE_1 == 1, "New South Wales",
+                                 SA2_CODE_1 == 2, "Victoria",
+                                 SA2_CODE_1 == 3, "Queensland",
+                                 SA2_CODE_1 == 4, "South Australia",
+                                 SA2_CODE_1 == 5, "Western Australia",
+                                 SA2_CODE_1 == 6, "Tasmania",
+                                 SA2_CODE_1 == 7, "Northern Territory",
+                                 SA2_CODE_1 == 8, "Australian Capital Territory")]
+erp_sa2_1995_2023_asgs2016[,SA2_CODE_1 := NULL]
+
+# Rearrange columns
+setcolorder(erp_sa2_1995_2023_asgs2016, c("Year", "STATE", "SA2_NAME", "SA2_CODE",
+                                          grep("^m_", names(erp_sa2_1995_2023_asgs2016), value = TRUE),
+                                          grep("^f_", names(erp_sa2_1995_2023_asgs2016), value = TRUE),
+                                          grep("^p_", names(erp_sa2_1995_2023_asgs2016), value = TRUE)))
+
+# Save SA2 estimates
+write.csv(erp_sa2_1995_2023_asgs2016, "Population estimates data/For cardiovascular diseases/Yearly/erp_sa2_1995_2023_asgs2016.csv", row.names = FALSE)
+
+# Remove temporary objects
+rm(cg_sa2_2016_sa2_2021, merged_data, col, pop_cols, age_cols, age)
 ```
 
 ## Creating SA2 proportions of counts relative to 2011
@@ -979,7 +1077,7 @@ b_erp_sa2_proportions <- copy(erp_sa2_proportions)
 # Step 4: Creating ASGS 2021 SA1 level population using ratios
 
 | Data Property | Specifications |
-|------------------------|-----------------------------------------------|
+|-------------------------|-----------------------------------------------|
 | Age | 1-year |
 | Sex | Male, female |
 | Spatial scope | Queensland |
@@ -1160,7 +1258,6 @@ rm(dt, dt_agg, sa2_names)
 Correspondence for converting SA1 ASGS2021 to SAL (suburbs) 2021 is available from:
 
 Australian Bureau of Statistics. (2021). ASGS Geographic Correspondences (2021) Edition 3. ABS. <https://data.gov.au/data/dataset/asgs-edition-3-2021-correspondences>.\
- 
 
 ## Code
 
@@ -1227,7 +1324,7 @@ erp_suburb_1995_2023_asgs2021[, p_all := rowSums(.SD), .SDcols = c("m_all", "f_a
 setnames(erp_suburb_1995_2023_asgs2021, c("SAL_CODE_2021", "SAL_NAME_2021"), c("SUBURB_CODE", "SUBURB_NAME"))
 
 # Save suburb estimates
-write.csv(erp_suburb_1995_2023_asgs2021, "Population estimates data/For cardiovascular diseases/erp_suburb_1995_2023_asgs2021.csv", row.names = FALSE)
+write.csv(erp_suburb_1995_2023_asgs2021, "Population estimates data/For cardiovascular diseases/Yearly/erp_suburb_1995_2023_asgs2021.csv", row.names = FALSE)
 
 # Remove temporary objects
 rm(cg_sa1_2021_sal_2021, merged_data, pop_cols, col)
@@ -1356,7 +1453,7 @@ erp_suburb_1995_2023_asgs2016[, p_all := rowSums(.SD), .SDcols = c("m_all", "f_a
 setnames(erp_suburb_1995_2023_asgs2016, c("SSC_CODE_2016", "SSC_NAME_2016"), c("SUBURB_CODE", "SUBURB_NAME"))
 
 # Save suburb estimates
-write.csv(erp_suburb_1995_2023_asgs2016, "Population estimates data/For cardiovascular diseases/erp_suburb_1995_2023_asgs2016.csv", row.names = FALSE)
+write.csv(erp_suburb_1995_2023_asgs2016, "Population estimates data/For cardiovascular diseases/Yearly/erp_suburb_1995_2023_asgs2016.csv", row.names = FALSE)
 
 # Remove temporary objects
 rm(cg_ssc_2016_sal_2021, merged_data, col, pop_cols)
