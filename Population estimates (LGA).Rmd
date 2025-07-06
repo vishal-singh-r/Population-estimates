@@ -883,10 +883,28 @@ rm(erp_summarised, abs_cols, i, numeric_cols, ratio_long, ratio_table, ratio_col
 erp_lga_1995_2023_asgs2021 <- copy(erp_backcasting)
 rm(erp_backcasting)
 
+# Add a new column LGA_CODE to erp_lga_1995_2023_asgs2021 using mapping with LGA_NAME column of erp_lga_2001_2023_asgs2021_m
+erp_lga_2001_2023_asgs2021_m <- as.data.table(read_excel("ABS data/erp_lga_2001_2023_asgs2021.xlsx", 
+                                                         sheet = "Table 1", skip = 6))
+setnames(erp_lga_2001_2023_asgs2021_m, old = "LGA code", new = "LGA_CODE")
+setnames(erp_lga_2001_2023_asgs2021_m, old = "LGA name", new = "LGA_NAME")
+erp_lga_2001_2023_asgs2021_m <- erp_lga_2001_2023_asgs2021_m[,.(LGA_CODE, LGA_NAME)]
+erp_lga_2001_2023_asgs2021_m <- unique(erp_lga_2001_2023_asgs2021_m)
+erp_lga_1995_2023_asgs2021 <- merge(erp_lga_1995_2023_asgs2021, erp_lga_2001_2023_asgs2021_m, by = "LGA_NAME", all.x = TRUE)
+rm(erp_lga_2001_2023_asgs2021_m)
+
+# Rearrange columns
+setcolorder(erp_lga_1995_2023_asgs2021, c("Year", "STATE", "LGA_NAME", "LGA_CODE",
+                                          grep("^m_", names(erp_lga_1995_2023_asgs2021), value = TRUE),
+                                          grep("^f_", names(erp_lga_1995_2023_asgs2021), value = TRUE),
+                                          grep("^p_", names(erp_lga_1995_2023_asgs2021), value = TRUE)))
+
 write.csv(erp_lga_1995_2023_asgs2021, "Population estimates data/5-year age groups/Yearly/erp_lga_1995_2023_asgs2021.csv", row.names = FALSE)
 
 # Remove STATE column
 erp_lga_1995_2023_asgs2021[, STATE := NULL]
+# Remove LGA_CODE column
+erp_lga_1995_2023_asgs2021[, LGA_CODE := NULL]
 ```
 
 # Step 4: Converting 2021 LGA to 2016 LGA using correspondece data
@@ -972,6 +990,25 @@ setnames(erp_lga_1995_2023_asgs2016, c("LGA_CODE_2016", "LGA_NAME_2016"), c("LGA
 # Remove rows with NA LGA_NAME
 erp_lga_1995_2023_asgs2016 <- erp_lga_1995_2023_asgs2016[!is.na(LGA_NAME)]
 
+# Form STATE column using LGA_CODE
+erp_lga_1995_2023_asgs2016[, `LGA_CODE_1` := substr(LGA_CODE, 1, 1)]
+erp_lga_1995_2023_asgs2016[, `LGA_CODE_1` := as.numeric(LGA_CODE_1)]
+erp_lga_1995_2023_asgs2016 <- erp_lga_1995_2023_asgs2016[LGA_CODE_1 != 9] # Removing all Other Territories as their data is not available from state level 
+erp_lga_1995_2023_asgs2016[, STATE := fcase(LGA_CODE_1 == 1, "New South Wales",
+                                 LGA_CODE_1 == 2, "Victoria",
+                                 LGA_CODE_1 == 3, "Queensland",
+                                 LGA_CODE_1 == 4, "South Australia",
+                                 LGA_CODE_1 == 5, "Western Australia",
+                                 LGA_CODE_1 == 6, "Tasmania",
+                                 LGA_CODE_1 == 7, "Northern Territory",
+                                 LGA_CODE_1 == 8, "Australian Capital Territory")]
+erp_lga_1995_2023_asgs2016[,LGA_CODE_1 := NULL]
+# Rearrange columns
+setcolorder(erp_lga_1995_2023_asgs2016, c("Year", "STATE", "LGA_NAME", "LGA_CODE",
+                                          grep("^m_", names(erp_lga_1995_2023_asgs2016), value = TRUE),
+                                          grep("^f_", names(erp_lga_1995_2023_asgs2016), value = TRUE),
+                                          grep("^p_", names(erp_lga_1995_2023_asgs2016), value = TRUE)))
+
 # Save lga estimates
 write.csv(erp_lga_1995_2023_asgs2016, "Population estimates data/5-year age groups/Yearly/erp_lga_1995_2023_asgs2016.csv", row.names = FALSE)
 
@@ -1017,6 +1054,7 @@ plot_ly(
 dt_agg <- copy(erp_lga_1995_2023_asgs2016)
 dt_agg <- dt_agg[, LGA_NAME := NULL]
 dt_agg <- dt_agg[, LGA_CODE := NULL]
+dt_agg <- dt_agg[, STATE := NULL]
 dt_agg <- dt_agg[, lapply(.SD, sum), by = Year]
 dt_agg <- melt(dt_agg, id.vars = "Year", variable.name = "Category", value.name = "Value")
 # Plot using Plotly
