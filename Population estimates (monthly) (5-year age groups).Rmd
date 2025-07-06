@@ -1,0 +1,517 @@
+---
+title: "Population estimates (monthly) (5-year age groups)"
+description: |
+  This article provides the steps to create population estimates for 5-year age group and sex combinations at monthly temporal resolution from 1995 to 2000 at SA2-level (Australia | 2021 boundaries) and 1995 to 2023 at suburb-level (Queensland, Australia | 2016 and 2021 boundaries). The goal is to produce monthly estimates from the estimates produced at yearly temporal resolution to maintain consistency between them. The fixed points are assumed to be at 1 July of each year, similar to ABS population estimates.
+author:
+  - name: "Vishal Singh"
+    url: https://github.com/ctrl-shift-vs
+    orcid_id: 0000-0003-3364-6708
+    affiliation: "School of Public Health and Social Work, Queensland University of Technology<br>Centre for Data Science, Queensland University of Technology"
+    affiliation_url: https://www.qut.edu.au/
+  - name: "Susanna Cramb"
+    url: https://www.qut.edu.au/about/our-people/academic-profiles/susanna.cramb
+    orcid_id: 0000-0003-3364-6708
+    affiliation: School of Public Health and Social Work, Queensland University of Technology
+    affiliation_url: https://www.qut.edu.au/
+  - name: "Javier Cortes-Ramirez"
+    url: https://www.qut.edu.au/about/our-people/academic-profiles/javier.cortesramirez
+    orcid_id: 0000-0002-5876-165X
+    affiliation: "School of Public Health and Social Work, Queensland University of Technology<br>Centre for Data Science, Queensland University of Technology"
+    affiliation_url: https://www.qut.edu.au/
+repository_url: https://github.com/ctrl-shift-vs/Population-estimates
+citation_url: https://github.com/ctrl-shift-vs/Population-estimates
+creative_commons: CC BY-SA
+date: "`r Sys.Date()`"
+output:
+    distill::distill_article:
+      toc: true
+      toc_depth: 2
+      code_folding: show
+---
+
+# Load packages
+
+```{r message=FALSE, warning=FALSE}
+library(colorspace)
+library(data.table)
+setDTthreads(0)
+library(dplyr)
+library(lazyeval)
+library(plotly)
+library(pracma)
+library(readr)
+library(readxl)
+library(stringr)
+library(tidyr)
+```
+
+# Step 1: Compare monthly interpolations
+
+There are many ways to get monthly interpolation results from yearly data, including linear interpolation, polynomial interpolation, nearest neighbour interpolation amoung others. However, there are pros and cons to each that must be considered in terms of how realistically they represent population change.
+
+The original population estimates need to stay fixed at a point in each year and the monthly interpolations need to form a smooth curve of changes. We can disregard nearest neighbour interpolation as it will create blocks of same population for each month, which defeats the purpose of getting monthly population estimates. Linear interpolation draws a straight line either a line without connecting points when we consider all years or connecting each adjacent year, which will create sudden changes in rate of change, so this method cannot be used either. Polynomial interpolations can provide smooth curve of change, but one function for all years would again fail to connect all the yearly data. A set of polynomial interpolations with knots for each year could be a solution as long as it does not create large oscillations deviating from knots. We will consider different interpolation methods in this category and choose the one that makes the most sense.
+
+ABS publishes annual estimated resident population and census for 1st July of that year, so we will use July month as fixed points because our estimates have been derived from these estimates.
+
+## Load data
+
+Load annual ERPs
+
+```{r}
+erp_sa2_1995_2023_asgs2016 <- as.data.table(read_csv("Population estimates data/5-year age groups/Yearly/erp_sa2_1995_2023_asgs2016.csv"))
+erp_sa2_1995_2023_asgs2021 <- as.data.table(read_csv("Population estimates data/5-year age groups/Yearly/erp_sa2_1995_2023_asgs2021.csv"))
+erp_suburb_1995_2023_asgs2016 <- as.data.table(read_csv("Population estimates data/5-year age groups/Yearly/erp_suburb_1995_2023_asgs2016.csv"))
+erp_suburb_1995_2023_asgs2021 <- as.data.table(read_csv("Population estimates data/5-year age groups/Yearly/erp_suburb_1995_2023_asgs2021.csv"))
+erp_lga_1995_2023_asgs2016 <- as.data.table(read_csv("Population estimates data/5-year age groups/Yearly/erp_lga_1995_2023_asgs2016.csv"))
+erp_lga_1995_2023_asgs2021 <- as.data.table(read_csv("Population estimates data/5-year age groups/Yearly/erp_lga_1995_2023_asgs2021.csv"))
+
+```
+
+## Function for comparing interpolation methods
+
+```{r}
+compare_interpolations <- function(dt, boundary_name) {
+  # Mid-year (1st July) positions
+  years_july <- dt$Year + 6/12
+  pop <- dt$p_all
+  # Extend time range to full months from Jan of first year to Dec of last year
+  start_full <- as.numeric(min(dt$Year))      # Jan of first year
+  end_full <- as.numeric(max(dt$Year) + 1) - 1/12  # Dec of last year
+  # Full monthly sequence
+  month_seq <- seq(start_full, end_full, by = 1/12)
+  # Perform interpolation
+  spline_fmm <- round(spline(x = years_july, y = pop, xout = month_seq, method = "fmm")$y)
+  spline_natural <- round(spline(x = years_july, y = pop, xout = month_seq, method = "natural")$y)
+  log_spline_fmm <- round(exp(spline(x = years_july, y = log(pop), xout = month_seq, method = "fmm")$y))
+  log_spline_natural <- round(exp(spline(x = years_july, y = log(pop), xout = month_seq, method = "natural")$y))
+  # # replace NaNs by 0 in log_spline_fmm
+  # log_spline_fmm[is.na(log_spline_fmm)] <- 0
+  # log_spline_natural[is.na(log_spline_natural)] <- 0
+  piecewise_poly <- round(pchip(xi = years_july, yi = pop, x = month_seq)) # Piecewise Cubic Hermitean Interpolation Polynomials
+  # Convert fractional year to year and month
+  year_part <- floor(month_seq)
+  month_part <- round(1 + 12 * (month_seq - year_part))
+  # Return data
+  data.table(
+    boundary_name = dt[[boundary_name]][1],
+    Year = year_part,
+    Month = month_part,
+    spline_fmm = spline_fmm,
+    spline_natural = spline_natural,
+    log_spline_fmm = log_spline_fmm,
+    log_spline_natural = log_spline_natural,
+    piecewise_poly = piecewise_poly
+  )
+}
+
+# Compute monthly interpolations
+erp_monthly_sa2_1995_2023_asgs2016 <- erp_sa2_1995_2023_asgs2016[, compare_interpolations(.SD, boundary_name = "SA2_NAME"),
+                                                                 by = SA2_NAME]
+erp_monthly_sa2_1995_2023_asgs2021 <- erp_sa2_1995_2023_asgs2021[, compare_interpolations(.SD, boundary_name = "SA2_NAME"),
+                                                                 by = SA2_NAME]
+erp_monthly_suburb_1995_2023_asgs2016 <- erp_suburb_1995_2023_asgs2016[, compare_interpolations(.SD, boundary_name = "SUBURB_NAME"),
+                                                                       by = SUBURB_NAME]
+erp_monthly_suburb_1995_2023_asgs2021 <- erp_suburb_1995_2023_asgs2021[, compare_interpolations(.SD, boundary_name = "SUBURB_NAME"),
+                                                                       by = SUBURB_NAME]
+erp_monthly_lga_1995_2023_asgs2021 <- erp_lga_1995_2023_asgs2021[, compare_interpolations(.SD, boundary_name = "LGA_NAME"),
+                                                                 by = LGA_NAME]
+erp_monthly_lga_1995_2023_asgs2016 <- erp_lga_1995_2023_asgs2016[, compare_interpolations(.SD, boundary_name = "LGA_NAME"),
+                                                                 by = LGA_NAME]
+
+# Add original population for each year
+erp_monthly_sa2_1995_2023_asgs2016 <- merge(erp_monthly_sa2_1995_2023_asgs2016,
+                                            erp_sa2_1995_2023_asgs2016[, .(Year, SA2_NAME, p_all)],
+                                            by = c("Year", "SA2_NAME"))
+erp_monthly_sa2_1995_2023_asgs2021 <- merge(erp_monthly_sa2_1995_2023_asgs2021,
+                                            erp_sa2_1995_2023_asgs2021[, .(Year, SA2_NAME, p_all)],
+                                            by = c("Year", "SA2_NAME"))
+erp_monthly_suburb_1995_2023_asgs2016 <- merge(erp_monthly_suburb_1995_2023_asgs2016,
+                                               erp_suburb_1995_2023_asgs2016[, .(Year, SUBURB_NAME, p_all)],
+                                               by = c("Year", "SUBURB_NAME"))
+erp_monthly_suburb_1995_2023_asgs2021 <- merge(erp_monthly_suburb_1995_2023_asgs2021,
+                                               erp_suburb_1995_2023_asgs2021[, .(Year, SUBURB_NAME, p_all)],
+                                               by = c("Year", "SUBURB_NAME"))
+erp_monthly_lga_1995_2023_asgs2016 <- merge(erp_monthly_lga_1995_2023_asgs2016,
+                                            erp_lga_1995_2023_asgs2016[, .(Year, LGA_NAME, p_all)],
+                                            by = c("Year", "LGA_NAME"))
+erp_monthly_lga_1995_2023_asgs2021 <- merge(erp_monthly_lga_1995_2023_asgs2021,
+                                            erp_lga_1995_2023_asgs2021[, .(Year, LGA_NAME, p_all)],
+                                            by = c("Year", "LGA_NAME"))
+
+# Add date column
+erp_monthly_sa2_1995_2023_asgs2016[, date := as.Date(sprintf("%d-%02d-01", Year, Month))]
+erp_monthly_sa2_1995_2023_asgs2021[, date := as.Date(sprintf("%d-%02d-01", Year, Month))]
+erp_monthly_suburb_1995_2023_asgs2016[, date := as.Date(sprintf("%d-%02d-01", Year, Month))]
+erp_monthly_suburb_1995_2023_asgs2021[, date := as.Date(sprintf("%d-%02d-01", Year, Month))]
+erp_monthly_lga_1995_2023_asgs2016[, date := as.Date(sprintf("%d-%02d-01", Year, Month))]
+erp_monthly_lga_1995_2023_asgs2021[, date := as.Date(sprintf("%d-%02d-01", Year, Month))]
+
+# Remove temporary objects
+rm(compare_interpolations)
+```
+
+## Visualy comparing differences in interpolation methods
+
+```{r fig.height=8, fig.width=9, warning=FALSE, layout="l-body-outset"}
+compare_interpolations_plot <- function(dt, boundary_name, sample_boundaries = NULL) {
+  # Plot all negative values unless sample_boundaries is provided
+  if (is.null(sample_boundaries)) {
+    sample_boundaries <- dt[spline_fmm < 0, unique(get(boundary_name))]
+  }
+  plot_data <- dt[get(boundary_name) %in% sample_boundaries]
+  # str(plot_data)
+  plot_ly(data = plot_data, x = ~date, y = ~spline_fmm, legendgroup = "fmm",  legendgrouptitle = list(text = "fmm"),
+          line = list(color = '#0000FFAA'), color = plot_data[[boundary_name]],
+          marker = list(color = "black", line = list(color = "black"), size = rep(c(0,0,0,0,0,0,5,0,0,0,0,0), 29)),
+          type = 'scatter', mode = 'markers+lines',
+          # type = "bar",
+          hoverinfo = 'text',
+          text = ~paste("Name:", plot_data[[boundary_name]],
+                        "<br>Date:", date,
+                        "<br>Population:", spline_fmm)) %>%
+    add_trace(x = ~date, y = ~spline_natural, legendgroup = "natural", legendgrouptitle = list(text = "natural"),
+              line = list(color = '#00FF00AA'),
+              text = ~paste("Name:", plot_data[[boundary_name]],
+                            "<br>Date:", date,
+                            "<br>Population:", spline_natural)) %>%
+    add_trace(x = ~date, y = ~log_spline_fmm, legendgroup = "log_spline_fmm", legendgrouptitle = list(text = "log_spline_fmm"),
+              line = list(color = '#00FFFFAA'),
+              text = ~paste("Name:", plot_data[[boundary_name]],
+                            "<br>Date:", date,
+                            "<br>Population:", log_spline_fmm)) %>%
+    add_trace(x = ~date, y = ~log_spline_natural, legendgroup = "log_spline_natural", legendgrouptitle = list(text = "log_spline_natural"),
+              line = list(color = '#FFFF00AA'),
+              text = ~paste("Name:", plot_data[[boundary_name]],
+                            "<br>Date:", date,
+                            "<br>Population:", log_spline_natural)) %>%
+    add_trace(x = ~date, y = ~piecewise_poly, legendgroup = "piecewise_poly", legendgrouptitle = list(text = "piecewise_poly"),
+              line = list(color = '#AAAAAAAA'),
+              text = ~paste("Name:", plot_data[[boundary_name]],
+                            "<br>Date:", date,
+                            "<br>Population:", piecewise_poly)) %>%
+    layout(title = "Monthly Interpolated Population", bargap = 0,
+           xaxis = list(title = "Date"),
+           yaxis = list(title = "Population"),
+           legend = list(title = list(text = "Boundary Name"))) %>%
+    config(toImageButtonOptions = list(
+      format = 'svg', scale = 1, height = 1000, width = 1000,
+      filename = 'Monthly Interpolated Population'))
+}
+
+# compare_interpolations_plot(erp_monthly_sa2_1995_2023_asgs2016, boundary_name = "SA2_NAME")
+# compare_interpolations_plot(erp_monthly_sa2_1995_2023_asgs2021, boundary_name = "SA2_NAME")
+# compare_interpolations_plot(erp_monthly_suburb_1995_2023_asgs2016, boundary_name = "SUBURB_NAME")
+# compare_interpolations_plot(erp_monthly_suburb_1995_2023_asgs2021, boundary_name = "SUBURB_NAME")
+# compare_interpolations_plot(erp_monthly_lga_1995_2023_asgs2016, boundary_name = "LGA_NAME")
+# compare_interpolations_plot(erp_monthly_lga_1995_2023_asgs2021, boundary_name = "LGA_NAME")
+
+# Did not draw to reduce file size
+
+# Make a table of the number of rows with negative values in each column
+methods <- c("spline_fmm", "spline_natural", "log_spline_fmm", "log_spline_natural", "piecewise_poly")
+datasets <- list(
+  SA2_16     = erp_monthly_sa2_1995_2023_asgs2016,
+  SA2_21     = erp_monthly_sa2_1995_2023_asgs2021,
+  Suburb_16  = erp_monthly_suburb_1995_2023_asgs2016,
+  Suburb_21  = erp_monthly_suburb_1995_2023_asgs2021,
+  LGA_16     = erp_monthly_lga_1995_2023_asgs2016,
+  LGA_21     = erp_monthly_lga_1995_2023_asgs2021
+)
+# Create table of negative counts
+negative_counts <- data.table(
+  Method = methods,
+  t(sapply(methods, function(m) sapply(datasets, function(dt) sum(dt[[m]] < 0))))
+)
+
+pchip_interpolations_plot <- function(dt, boundary_name, sample_boundaries = NULL) {
+  # Plot all negative values unless sample_boundaries is provided
+  if (is.null(sample_boundaries)) {
+    sample_boundaries <- dt[spline_fmm < 0, unique(get(boundary_name))]
+  }
+  plot_data <- dt[get(boundary_name) %in% sample_boundaries]
+  # str(plot_data)
+  plot_ly(data = plot_data, x = ~date, y = ~piecewise_poly, #legendgroup = "piecewise_poly",  legendgrouptitle = list(text = "piecewise_poly"),
+          line = list(color = '#AAAAAAAA'), color = plot_data[[boundary_name]],
+          marker = list(color = "black", line = list(color = "black"), size = rep(c(0,0,0,0,0,0,5,0,0,0,0,0), 29)),
+          type = 'scatter', mode = 'markers+lines',
+          # type = "bar",
+          hoverinfo = 'text',
+          text = ~paste("Name:", plot_data[[boundary_name]],
+                        "<br>Date:", date,
+                        "<br>Population:", piecewise_poly)) %>%
+    layout(title = "Monthly Interpolated Population", bargap = 0,
+           xaxis = list(title = "Date"),
+           yaxis = list(title = "Population"),
+           legend = list(title = list(text = "Boundary Name"))) %>%
+    config(toImageButtonOptions = list(
+      format = 'svg', scale = 1, height = 1000, width = 1000,
+      filename = 'Monthly Interpolated Population'))
+}
+
+# Looking at pchip negative values in more detail
+monthly_sa2_16_neg <- c(erp_monthly_sa2_1995_2023_asgs2016[Year == 1995 & Month < 7][piecewise_poly < 0, unique(SA2_NAME)],
+                     erp_monthly_sa2_1995_2023_asgs2016[Year == 2023 & Month > 7][piecewise_poly < 0, unique(SA2_NAME)])
+monthly_sa2_21_neg <- c(erp_monthly_sa2_1995_2023_asgs2021[Year == 1995 & Month < 7][piecewise_poly < 0, unique(SA2_NAME)],
+                     erp_monthly_sa2_1995_2023_asgs2021[Year == 2023 & Month > 7][piecewise_poly < 0, unique(SA2_NAME)])
+monthly_sub_16_neg <- c(erp_monthly_suburb_1995_2023_asgs2016[Year == 1995 & Month < 7][piecewise_poly < 0, unique(SUBURB_NAME)],
+                        erp_monthly_suburb_1995_2023_asgs2016[Year == 2023 & Month > 7][piecewise_poly < 0, unique(SUBURB_NAME)])
+monthly_sub_21_neg <- c(erp_monthly_suburb_1995_2023_asgs2021[Year == 1995 & Month < 7][piecewise_poly < 0, unique(SUBURB_NAME)],
+                        erp_monthly_suburb_1995_2023_asgs2021[Year == 2023 & Month > 7][piecewise_poly < 0, unique(SUBURB_NAME)])
+
+monthly_sa2_16_0 <- c(erp_monthly_sa2_1995_2023_asgs2016[Year == 1995 & Month < 7][piecewise_poly == 0, unique(SA2_NAME)],
+                      erp_monthly_sa2_1995_2023_asgs2016[Year == 2023 & Month > 7][piecewise_poly == 0, unique(SA2_NAME)])
+monthly_sa2_21_0 <- c(erp_monthly_sa2_1995_2023_asgs2021[Year == 1995 & Month < 7][piecewise_poly == 0, unique(SA2_NAME)],
+                      erp_monthly_sa2_1995_2023_asgs2021[Year == 2023 & Month > 7][piecewise_poly == 0, unique(SA2_NAME)])
+monthly_suburb_16_0 <- c(erp_monthly_suburb_1995_2023_asgs2016[Year == 1995 & Month < 7][piecewise_poly == 0, unique(SUBURB_NAME)],
+                         erp_monthly_suburb_1995_2023_asgs2016[Year == 2023 & Month > 7][piecewise_poly == 0, unique(SUBURB_NAME)])
+monthly_suburb_21_0 <- c(erp_monthly_suburb_1995_2023_asgs2021[Year == 1995 & Month < 7][piecewise_poly == 0, unique(SUBURB_NAME)],
+                         erp_monthly_suburb_1995_2023_asgs2021[Year == 2023 & Month > 7][piecewise_poly == 0, unique(SUBURB_NAME)])
+
+
+# Negatives
+# pchip_interpolations_plot(erp_monthly_sa2_1995_2023_asgs2016, boundary_name = "SA2_NAME",
+#                           sample_boundaries = monthly_sa2_16_neg)
+# pchip_interpolations_plot(erp_monthly_sa2_1995_2023_asgs2021, boundary_name = "SA2_NAME",
+#                           sample_boundaries = monthly_sa2_21_neg)
+# pchip_interpolations_plot(erp_monthly_suburb_1995_2023_asgs2016, boundary_name = "SUBURB_NAME",
+#                           sample_boundaries = monthly_sub_16_neg)
+# pchip_interpolations_plot(erp_monthly_suburb_1995_2023_asgs2021, boundary_name = "SUBURB_NAME",
+#                           sample_boundaries = monthly_sub_21_neg)
+# Zeroes
+# pchip_interpolations_plot(erp_monthly_sa2_1995_2023_asgs2016, boundary_name = "SA2_NAME",
+#                           sample_boundaries = monthly_sa2_16_0)
+# pchip_interpolations_plot(erp_monthly_sa2_1995_2023_asgs2021, boundary_name = "SA2_NAME",
+#                           sample_boundaries = monthly_sa2_21_0)
+# pchip_interpolations_plot(erp_monthly_suburb_1995_2023_asgs2016, boundary_name = "SUBURB_NAME",
+#                           sample_boundaries = monthly_suburb_16_0)
+# pchip_interpolations_plot(erp_monthly_suburb_1995_2023_asgs2021, boundary_name = "SUBURB_NAME",
+#                           sample_boundaries = monthly_suburb_21_0)
+
+# Did not draw to reduce file size
+
+# Remove temporary objects
+rm(compare_interpolations_plot, pchip_interpolations_plot,
+   methods, datasets, negative_counts,
+   monthly_sa2_16_neg, monthly_sa2_21_neg, monthly_sub_16_neg, monthly_sub_21_neg,
+   monthly_sa2_16_neg, monthly_sa2_21_0, monthly_suburb_16_0, monthly_suburb_21_0)
+
+# Overall, pchip works best handling low populations near sudden changes very well without resulting in negative values
+# However, it produced some negative results around the edges (Jan - Jun 1995 and Aug - Dec 2023); 
+# Upon investigation, we can safely replace them last known non-zero, non-negative value
+```
+
+## Before going forward, why we need monthly population estimates?
+
+```{r warning=FALSE, layout="l-body-outset", fig.height=8, fig.width = 9}
+set.seed(456)
+sample_SA2 <- sample(unique(erp_monthly_sa2_1995_2023_asgs2021$SA2_NAME), 5)
+
+# sample_SA2 <- "Canning Vale - East"
+
+plot_data <- erp_monthly_sa2_1995_2023_asgs2021[SA2_NAME %in% sample_SA2]
+plot_data[, date := ((Year + (Month / 12)) - 1/12)]
+accumulate_by <- function(dat, var) {
+  var <- f_eval(var, dat)
+  lvls <- plotly:::getLevels(var)
+  dats <- lapply(seq_along(lvls), function(x) {
+    cbind(dat[var %in% lvls[seq(1, x)], ], frame = lvls[[x]])
+  })
+  bind_rows(dats)
+}
+plot_data <- plot_data %>% accumulate_by(~date)
+
+plot_ly(data = plot_data, x = ~date, y = ~p_all, frame = ~frame, 
+        type = 'scatter', mode = 'lines',
+        legendgroup = "Yearly population estimates", legendgrouptitle = list(text = "Yearly population estimates"),
+        group = ~SA2_NAME, split = ~SA2_NAME,
+        line = list(color = 'red', width = 2),
+        hoverinfo = 'text',
+        text = ~paste("SA2:", SA2_NAME,
+                      "<br>Date:", date,
+                      "<br>Population:", p_all)) %>%
+  add_trace(x = ~date, y = ~piecewise_poly,
+            legendgroup = "Monthly population estimates", legendgrouptitle = list(text = "Monthly population estimates"), frame = ~frame,
+            line = list(color = 'green', width = 2),
+            text = ~paste("Name:", SA2_NAME,
+                          "<br>Date:", date,
+                          "<br>Population:", piecewise_poly)) %>%
+  animation_opts(frame = 50, transition = 20, redraw = FALSE) %>%
+  animation_slider(hide = T) %>%
+  animation_button(x = 1, xanchor = "right", y = 0, yanchor = "bottom") %>%
+  layout(title = "Monthly vs Yearly Population Estimates",
+         xaxis = list(title = "Date"),
+         yaxis = list(title = "Population"),
+         legend = list(title = list(text = "SA2"))) %>%
+  config(toImageButtonOptions = list(
+    format = 'svg', scale = 1, height = 1000, width = 1000,
+    filename = 'Monthly vs Yearly Population'))
+
+# Remove temporary objects
+rm(sample_SA2, plot_data, accumulate_by)
+
+```
+
+# Step 2: Create monthly population estimates
+
+## Function to create monthly population estimates
+
+```{r}
+
+# Pre-processing year and month to date conversion
+dates <- CJ(Year = 1995:2023,
+            Month = 1:12)
+dates[, Date := as.Date(sprintf("%d-%02d-01", Year, Month))]
+
+create_monthly_erp <- function(dt, boundary_name) {
+  # Mid-year (1st July) positions
+  years_july <- dt$Year + 6/12
+  # Extend time range to full months from Jan of first year to Dec of last year
+  start_full <- as.numeric(min(dt$Year))      # Jan of first year
+  end_full <- as.numeric(max(dt$Year) + 1) - 1/12  # Dec of last year
+  # Full monthly sequence
+  month_seq <- seq(start_full, end_full, by = 1/12)
+  # Convert fractional year to year and month
+  year_part <- floor(month_seq)
+  month_part <- round(1 + 12 * (month_seq - year_part))
+  # Get all columns in dt starting with "m_", "f_" or "p_" using grep
+  pop_columns <- grep("^(m_|f_|p_)", names(dt), value = TRUE)
+  int_res <- list()
+  for (pop in pop_columns) {
+    # Piecewise Cubic Hermitean Interpolation Polynomials
+    interpolated <- round(pchip(xi = years_july, yi = dt[[pop]], x = month_seq))
+    # Identify indices where values are 0 or negative
+    bad_idx <- which(interpolated <= 0)
+    if (length(bad_idx) > 0) {
+      # Replace with nearest July value from original mid-year positions
+      for (i in bad_idx) {
+        # Find month in decimal
+        t_month <- month_seq[i]
+        # Find nearest July (mid-year) value
+        nearest_july_idx <- which.min(abs(years_july - t_month))
+        interpolated[i] <- dt[[pop]][nearest_july_idx]
+      }
+    }
+    int_res[[pop]] <- interpolated
+  }
+  int_result <- as.data.table(int_res)
+  # Return data
+  if (boundary_name == "SA2_NAME") {
+    temp_dt <- data.table(
+      Year = year_part,
+      Month = month_part,
+      Date = dates$Date,
+      STATE = dt[["STATE"]][1],
+      boundary_name = dt[[boundary_name]][1],
+      SA2_CODE = dt[["SA2_CODE"]][1])
+  } else if (boundary_name == "SUBURB_NAME") {
+    temp_dt <- data.table(
+      Year = year_part,
+      Month = month_part,
+      Date = dates$Date,
+      SUBURB_NAME = dt[["SUBURB_NAME"]][1],
+      SUBURB_CODE = dt[["SUBURB_CODE"]][1])
+  } else if (boundary_name == "LGA_NAME") {
+    temp_dt <- data.table(
+      Year = year_part,
+      Month = month_part,
+      Date = dates$Date,
+      LGA_NAME = dt[["LGA_NAME"]][1],
+      LGA_CODE = dt[["LGA_CODE"]][1])
+  }
+  # Merge temp_dt with int_res by row
+  result <- cbind(temp_dt, int_result)
+  return(result)
+}
+
+erp_monthly_sa2_1995_2023_asgs2016 <- erp_sa2_1995_2023_asgs2016[, create_monthly_erp(.SD, boundary_name = "SA2_NAME"), by = SA2_NAME]
+erp_monthly_sa2_1995_2023_asgs2021 <- erp_sa2_1995_2023_asgs2021[, create_monthly_erp(.SD, boundary_name = "SA2_NAME"), by = SA2_NAME]
+erp_monthly_suburb_1995_2023_asgs2016 <- erp_suburb_1995_2023_asgs2016[, create_monthly_erp(.SD, boundary_name = "SUBURB_NAME"), by = SUBURB_NAME]
+erp_monthly_suburb_1995_2023_asgs2021 <- erp_suburb_1995_2023_asgs2021[, create_monthly_erp(.SD, boundary_name = "SUBURB_NAME"), by = SUBURB_NAME]
+erp_monthly_lga_1995_2023_asgs2016 <- erp_lga_1995_2023_asgs2016[, create_monthly_erp(.SD, boundary_name = "LGA_NAME"), by = LGA_NAME]
+erp_monthly_lga_1995_2023_asgs2021 <- erp_lga_1995_2023_asgs2021[, create_monthly_erp(.SD, boundary_name = "LGA_NAME"), by = LGA_NAME]
+
+# Save population estimates
+write.csv(erp_monthly_sa2_1995_2023_asgs2016, "Population estimates data/5-year age groups/Monthly/erp_monthly_sa2_1995_2023_asgs2016.csv", row.names = FALSE)
+write.csv(erp_monthly_sa2_1995_2023_asgs2021, "Population estimates data/5-year age groups/Monthly/erp_monthly_sa2_1995_2023_asgs2021.csv", row.names = FALSE)
+write.csv(erp_monthly_suburb_1995_2023_asgs2016, "Population estimates data/5-year age groups/Monthly/erp_monthly_suburb_1995_2023_asgs2016.csv", row.names = FALSE)
+write.csv(erp_monthly_suburb_1995_2023_asgs2021, "Population estimates data/5-year age groups/Monthly/erp_monthly_suburb_1995_2023_asgs2021.csv", row.names = FALSE)
+write.csv(erp_monthly_lga_1995_2023_asgs2016, "Population estimates data/5-year age groups/Monthly/erp_monthly_lga_1995_2023_asgs2016.csv", row.names = FALSE)
+write.csv(erp_monthly_lga_1995_2023_asgs2021, "Population estimates data/5-year age groups/Monthly/erp_monthly_lga_1995_2023_asgs2021.csv", row.names = FALSE)
+
+# Remove temporary objects
+rm(dates, create_monthly_erp)
+```
+
+## Visualise results
+
+```{r warning=FALSE, layout="l-body-outset", fig.height=8, fig.width = 9}
+final_interpolations_plot <- function(dt, boundary_name, sample_boundaries = NULL) {
+  # Plot all negative values unless sample_boundaries is provided
+  if (is.null(sample_boundaries)) {
+    sample_boundaries <- dt[p_all < 0, unique(get(boundary_name))]
+  }
+  plot_data <- dt[get(boundary_name) %in% sample_boundaries]
+  # str(plot_data)
+  plot_ly(data = plot_data, x = ~Date, y = ~p_all,
+          line = list(color = '#AAAAAAAA'), color = plot_data[[boundary_name]],
+          marker = list(color = "black", line = list(color = "black"), size = rep(c(0,0,0,0,0,0,5,0,0,0,0,0), 29)),
+          type = 'scatter', mode = 'markers+lines',
+          # type = "bar",
+          hoverinfo = 'text',
+          text = ~paste("Name:", plot_data[[boundary_name]],
+                        "<br>Date:", Date,
+                        "<br>Population:", p_all)) %>%
+    layout(title = "Monthly Interpolated Population", bargap = 0,
+           xaxis = list(title = "Date"),
+           yaxis = list(title = "Population"),
+           legend = list(title = list(text = "Boundary Name"))) %>%
+    config(toImageButtonOptions = list(
+      format = 'svg', scale = 1, height = 1000, width = 1000,
+      filename = 'Monthly Interpolated Population'))
+}
+
+# Looking at pchip negative values in more detail
+monthly_sa2_16_neg <- c(erp_monthly_sa2_1995_2023_asgs2016[Year == 1995 & Month < 7][p_all < 0, unique(SA2_NAME)],
+                     erp_monthly_sa2_1995_2023_asgs2016[Year == 2023 & Month > 7][p_all < 0, unique(SA2_NAME)])
+monthly_sa2_21_neg <- c(erp_monthly_sa2_1995_2023_asgs2021[Year == 1995 & Month < 7][p_all < 0, unique(SA2_NAME)],
+                     erp_monthly_sa2_1995_2023_asgs2021[Year == 2023 & Month > 7][p_all < 0, unique(SA2_NAME)])
+monthly_sub_16_neg <- c(erp_monthly_suburb_1995_2023_asgs2016[Year == 1995 & Month < 7][p_all < 0, unique(SUBURB_NAME)],
+                        erp_monthly_suburb_1995_2023_asgs2016[Year == 2023 & Month > 7][p_all < 0, unique(SUBURB_NAME)])
+monthly_sub_21_neg <- c(erp_monthly_suburb_1995_2023_asgs2021[Year == 1995 & Month < 7][p_all < 0, unique(SUBURB_NAME)],
+                        erp_monthly_suburb_1995_2023_asgs2021[Year == 2023 & Month > 7][p_all < 0, unique(SUBURB_NAME)])
+
+monthly_sa2_16_0 <- c(erp_monthly_sa2_1995_2023_asgs2016[Year == 1995 & Month < 7][p_all == 0, unique(SA2_NAME)],
+                      erp_monthly_sa2_1995_2023_asgs2016[Year == 2023 & Month > 7][p_all == 0, unique(SA2_NAME)])
+monthly_sa2_21_0 <- c(erp_monthly_sa2_1995_2023_asgs2021[Year == 1995 & Month < 7][p_all == 0, unique(SA2_NAME)],
+                      erp_monthly_sa2_1995_2023_asgs2021[Year == 2023 & Month > 7][p_all == 0, unique(SA2_NAME)])
+monthly_suburb_16_0 <- c(erp_monthly_suburb_1995_2023_asgs2016[Year == 1995 & Month < 7][p_all == 0, unique(SUBURB_NAME)],
+                         erp_monthly_suburb_1995_2023_asgs2016[Year == 2023 & Month > 7][p_all == 0, unique(SUBURB_NAME)])
+monthly_suburb_21_0 <- c(erp_monthly_suburb_1995_2023_asgs2021[Year == 1995 & Month < 7][p_all == 0, unique(SUBURB_NAME)],
+                         erp_monthly_suburb_1995_2023_asgs2021[Year == 2023 & Month > 7][p_all == 0, unique(SUBURB_NAME)])
+
+# Negatives
+# final_interpolations_plot(erp_monthly_sa2_1995_2023_asgs2016, boundary_name = "SA2_NAME",
+#                           sample_boundaries = monthly_sa2_16_neg)
+# final_interpolations_plot(erp_monthly_sa2_1995_2023_asgs2021, boundary_name = "SA2_NAME",
+#                           sample_boundaries = monthly_sa2_21_neg)
+# final_interpolations_plot(erp_monthly_suburb_1995_2023_asgs2016, boundary_name = "SUBURB_NAME",
+#                           sample_boundaries = monthly_sub_16_neg)
+# final_interpolations_plot(erp_monthly_suburb_1995_2023_asgs2021, boundary_name = "SUBURB_NAME",
+#                           sample_boundaries = monthly_sub_21_neg)
+# Zeroes
+# final_interpolations_plot(erp_monthly_sa2_1995_2023_asgs2016, boundary_name = "SA2_NAME",
+#                           sample_boundaries = monthly_sa2_16_0)
+# final_interpolations_plot(erp_monthly_sa2_1995_2023_asgs2021, boundary_name = "SA2_NAME",
+#                           sample_boundaries = monthly_sa2_21_0)
+# final_interpolations_plot(erp_monthly_suburb_1995_2023_asgs2016, boundary_name = "SUBURB_NAME",
+#                           sample_boundaries = monthly_suburb_16_0)
+# final_interpolations_plot(erp_monthly_suburb_1995_2023_asgs2021, boundary_name = "SUBURB_NAME",
+#                           sample_boundaries = monthly_suburb_21_0)
+
+# Did not draw to reduce file size
+
+# Remove temporary objects
+rm(final_interpolations_plot,
+   monthly_sa2_16_neg, monthly_sa2_21_neg, monthly_sub_16_neg, monthly_sub_21_neg,
+   monthly_sa2_16_0, monthly_sa2_21_0, monthly_suburb_16_0, monthly_suburb_21_0)
+```
