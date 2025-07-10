@@ -4,7 +4,7 @@ description: |
   This article provides the steps to create population estimates for age groups suitable for cardiovascular disease research and sex combinations from 1995 to 2000 at SA2-level (Australia | 2021 boundaries) and 1995 to 2023 at suburb-level (Queensland, Australia | 2016 and 2021 boundaries)
 author:
   - name: "Vishal Singh"
-    url: https://github.com/ctrl-shift-vs
+    url: https://github.com/vishal-singh-r
     orcid_id: 0000-0003-3364-6708
     affiliation: "School of Public Health and Social Work, Queensland University of Technology<br>Centre for Data Science, Queensland University of Technology"
     affiliation_url: https://www.qut.edu.au/
@@ -18,8 +18,8 @@ author:
     orcid_id: 0000-0002-5876-165X
     affiliation: "School of Public Health and Social Work, Queensland University of Technology<br>Centre for Data Science, Queensland University of Technology"
     affiliation_url: https://www.qut.edu.au/
-repository_url: https://github.com/ctrl-shift-vs/Population-estimates
-citation_url: https://github.com/ctrl-shift-vs/Population-estimates
+repository_url: https://github.com/vishal-singh-r/Population-estimates
+citation_url: https://github.com/vishal-singh-r/Population-estimates
 creative_commons: CC BY-SA
 date: "`r Sys.Date()`"
 output:

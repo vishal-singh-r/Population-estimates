@@ -34,19 +34,19 @@ Minor changes were made between 2016 and 2021 suburb boundaries, which resulted 
 If you see mistakes or want to suggest changes, please create an issue on the source repository.
 
 ## Reuse
-Text and figures are licensed under Creative Commons Attribution CC BY-SA 4.0. Source code is available at https://github.com/ctrl-shift-vs/Population-estimates, unless otherwise noted. The figures that have been reused from other sources don't fall under this license and can be recognized by a note in their caption: "Figure from ...".
+Text and figures are licensed under Creative Commons Attribution CC BY-SA 4.0. Source code is available at https://github.com/vishal-singh-r/Population-estimates, unless otherwise noted. The figures that have been reused from other sources don't fall under this license and can be recognized by a note in their caption: "Figure from ...".
 
 ## Funding
 Vishal Singh is supported by QUT Postgraduate Research Award (QUTPRA) from the Queensland University of Technology and PhD Top-Up Scholarship Award from the Queensland Cardiovascular Research Network (QCVRN)
 
 ## Citation
 ### For attribution, please cite this work as:
-Singh, et al. (2025, March 8). Population estimates. Retrieved from https://github.com/ctrl-shift-vs/Population-estimates
+Singh, et al. (2025, March 8). Population estimates. Retrieved from https://github.com/vishal-singh-r/Population-estimates
 
 ### BibTeX citation:
 @misc{singh2025population,
   author = {Singh, Vishal and Cramb, Susanna and Cortes-Ramirez, Javier},
   title = {Population estimates},
-  url = {https://github.com/ctrl-shift-vs/Population-estimates},
+  url = {https://github.com/vishal-singh-r/Population-estimates},
   year = {2025}
 }
