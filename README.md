@@ -41,12 +41,13 @@ Vishal Singh is supported by QUT Postgraduate Research Award (QUTPRA) from the Q
 
 ## Citation
 ### For attribution, please cite this work as:
-Singh, et al. (2025, March 8). Population estimates. Retrieved from https://github.com/vishal-singh-r/Population-estimates
+Singh, Vishal; Cortes-Ramirez, Javier; Cramb, Susanna; (2025): Australian population estimates from 1995 to 2023 at SA2, LGA and suburb level. Queensland University of Technology. (Dataset) https://doi.org/10.25912/RDF_1754364067671
 
 ### BibTeX citation:
 @misc{singh2025population,
   author = {Singh, Vishal and Cramb, Susanna and Cortes-Ramirez, Javier},
-  title = {Population estimates},
-  url = {https://github.com/vishal-singh-r/Population-estimates},
+  title = {Australian population estimates from 1995 to 2023 at SA2, LGA and suburb level},
+  publisher = {Queensland University of Technology}
+  url = {[https://github.com/vishal-singh-r/Population-estimates](https://doi.org/10.25912/RDF_1754364067671)},
   year = {2025}
 }
